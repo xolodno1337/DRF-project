@@ -3,6 +3,12 @@ from rest_framework.serializers import ModelSerializer
 from materials.models import Course, Lesson
 
 
+class LessonSerializer(ModelSerializer):
+    class Meta:
+        model = Lesson
+        fields = '__all__'
+
+
 class CourseSerializer(ModelSerializer):
     class Meta:
         model = Course
@@ -10,6 +16,7 @@ class CourseSerializer(ModelSerializer):
 
 
 class CourseDetailSerializer(ModelSerializer):
+    lessons = LessonSerializer(many=True, read_only=True)
     numbers_lesson = SerializerMethodField()
 
     def get_numbers_lesson(self, course):
@@ -17,10 +24,4 @@ class CourseDetailSerializer(ModelSerializer):
 
     class Meta:
         model = Course
-        fields = '__all__'
-
-
-class LessonSerializer(ModelSerializer):
-    class Meta:
-        model = Lesson
         fields = '__all__'
