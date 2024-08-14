@@ -66,13 +66,13 @@ class LessonUpdateAPIView(UpdateAPIView):
 class LessonDestroyAPIView(DestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = [IsAuthenticated, ~IsModer | IsOwner]
+    permission_classes = [IsAuthenticated, ~IsModer & IsOwner]
 
 
 class CourseListAPIView(ListAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    permission_classes = [IsAuthenticated, IsModer]
+    permission_classes = [IsAuthenticated, IsModer | IsOwner]
 
 
 class PaymentListAPIView(ListAPIView):
