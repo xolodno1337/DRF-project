@@ -1,10 +1,13 @@
 from rest_framework.fields import SerializerMethodField
 from rest_framework.serializers import ModelSerializer
 from materials.models import Course, Lesson
+from materials.validators import YoutubeValidators
 from users.models import Payment
 
 
 class LessonSerializer(ModelSerializer):
+    validators = [YoutubeValidators(field='video_url')]
+
     class Meta:
         model = Lesson
         fields = '__all__'
