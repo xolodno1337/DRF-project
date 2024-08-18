@@ -1,5 +1,5 @@
 from django.contrib import admin
-from materials.models import Course, Lesson
+from materials.models import Course, Lesson, Subscription
 from users.models import User, Payment
 
 
@@ -19,5 +19,10 @@ class LessonAdmin(admin.ModelAdmin):
 
 
 @admin.register(Payment)
-class LessonAdmin(admin.ModelAdmin):
+class PaymentAdmin(admin.ModelAdmin):
     list_display = ('user', 'payment_course', 'payment_lesson', 'payment_sum', 'payment_method')
+
+
+@admin.register(Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = ('user', 'course')

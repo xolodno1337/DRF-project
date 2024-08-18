@@ -1,10 +1,14 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
-from materials.models import Course, Lesson
-from materials.serializers import CourseSerializer, LessonSerializer, CourseDetailSerializer, PaymentSerializer
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView, \
+    get_object_or_404
+from materials.models import Course, Lesson, Subscription
+from materials.serializers import CourseSerializer, LessonSerializer, CourseDetailSerializer, PaymentSerializer, \
+    SubscriptionSerializer
 from users.models import Payment
 from users.permissions import IsModer, IsOwner
 
@@ -81,3 +85,27 @@ class PaymentListAPIView(ListAPIView):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ('payment_course', 'payment_lesson', 'payment_method')
     ordering_fields = ['payment_date']
+
+
+class SubscriptionAPIView(APIView):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        course_id = request.data.get('course_id')
+        course_item = get_object_or_404(Course, id=course_id)
+        subs_item = Subscription.objects.filter(user=user, course=course_item)
+        if subs_item.exists():
+            subs_item.delete()
+            message = 'Подписка удалена'
+        else:
+            Subscription.objects.create(user=user, course=course_item)
+            message = 'Подписка добавлена'
+        return Response({"message": message})
+
+
+class SubscriptionListAPIView(ListAPIView):
+    serializer_class = SubscriptionSerializer
+    queryset = Subscription.objects.all()
