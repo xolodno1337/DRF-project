@@ -58,7 +58,17 @@ class LessonTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+
+class SubscriptionTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create(email='test@sky.com')
+        self.course = Course.objects.create(title='Python', description='Django')
+        self.lesson = Lesson.objects.create(title='Основы программирования', course=self.course, owner=self.user)
+        self.subscription = Subscription.objects.create(user=self.user, course=self.course)
+        self.client.force_authenticate(user=self.user)
+
     def test_subscribe_to_course(self):
+        Subscription.objects.all().delete()
         url = reverse('materials:subscription_create')
         data = {'course_id': self.course.id}
         response = self.client.post(url, data, format='json')
@@ -67,7 +77,6 @@ class LessonTestCase(APITestCase):
         self.assertTrue(Subscription.objects.filter(user=self.user, course=self.course).exists())
 
     def test_subscription_list(self):
-        Subscription.objects.create(user=self.user, course=self.course)
         url = reverse('materials:subscription_list')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
