@@ -12,7 +12,7 @@ class Course(models.Model):
                               help_text='Укажите владельца курса', **NULLABLE)
 
     def __str__(self):
-        return self.title
+        return self.name
 
     class Meta:
         verbose_name = 'Курс'
