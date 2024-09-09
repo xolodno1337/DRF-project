@@ -12,6 +12,7 @@ from materials.serializers import CourseSerializer, LessonSerializer, CourseDeta
     SubscriptionSerializer
 from users.models import Payment
 from users.permissions import IsModer, IsOwner
+from materials.tasks import sending_updates
 
 
 class CourseViewSet(ModelViewSet):
@@ -37,6 +38,11 @@ class CourseViewSet(ModelViewSet):
     def perform_create(self, serializer):
         course = serializer.save()
         course.owner = self.request.user
+        course.save()
+
+    def perform_update(self, serializer):
+        course = serializer.save()
+        sending_updates.delay(course)
         course.save()
 
 
