@@ -1,14 +1,13 @@
 from celery import shared_task
+from dateutil.relativedelta import relativedelta
+
 from users.models import User
-from datetime import datetime, timedelta
+from datetime import timezone
 
 
 @shared_task
 def deactivate_user():
-    users = User.objects.all()
-    data_now = datetime.now()
-    data_deactivate = timedelta(days=30)
-    for user in users:
-        if data_now - user.last_login > data_deactivate:
-            user.is_active = False
-            user.save()
+    """Деактивирует пользователя, если он не заходил на сайт в течение 1 месяца."""
+    month_ago = timezone.now() - relativedelta(months=1)
+    qs = User.objects.filter(is_active=True, last_login__lte=month_ago)
+    qs.update(is_acitve=False)
